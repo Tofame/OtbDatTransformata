@@ -16,6 +16,5 @@ add_executable(OtbDatTransformata main.cpp
         Loaders/itemLoader_enums.h
         tools.h
         Loaders/ClientIdToServerIdMap.h
-        ItemType.cpp
         Loaders/DatAttributes.h
 )

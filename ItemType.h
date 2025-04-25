@@ -149,8 +149,6 @@ public:
     bool stopTime = false;
     bool showCount = true;
 
-    void unserialize(uint16_t clientId, std::ifstream& fin);
-
     // Dat properties
     uint8_t height;
     uint8_t width;
