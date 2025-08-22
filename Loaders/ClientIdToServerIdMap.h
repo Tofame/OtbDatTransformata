@@ -11,7 +11,7 @@ public:
 
     void emplace(uint16_t clientId, uint16_t serverId) {
         if (clientId >= vec.size()) {
-            vec.resize(clientId + 1, 0);
+            vec.resize(vec.size() * 2, 0);
         }
 
         if (vec[clientId] == 0) {
