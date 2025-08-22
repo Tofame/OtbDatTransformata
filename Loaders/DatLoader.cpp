@@ -149,8 +149,15 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
             case ThingAttrPickupable:
                 itemType.pickupable = true;
                 break;
-            default:
                 //m_attribs.set(attr, true);
+            default:
+                if(not
+                    ((attr >= ThingAttrGround and attr <= ThingAttrDontCenterOutfit) or
+                    (attr >= ThingAttrOpacity and attr <= ThingAttrNotPreWalkable) or
+                    (attr >= ThingAttrDefaultAction and attr <=ThingLastAttr)))
+                {
+                    std::cout << "[DatLoader::unserialize] Unknown attribute spotted: " << static_cast<int>(attr) << std::endl;
+                }
                 break;
         }
     }

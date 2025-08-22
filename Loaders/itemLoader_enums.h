@@ -95,8 +95,8 @@ enum rootattrib_ {
     ROOT_ATTR_VERSION = 0x01,
 };
 
-enum itemattrib_t {
-    ITEM_ATTR_FIRST = 0x10,
+enum itemattrib_t : uint8_t {
+    ITEM_ATTR_FIRST = 16,
     ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
     ITEM_ATTR_CLIENTID,
     ITEM_ATTR_NAME,

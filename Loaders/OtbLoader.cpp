@@ -164,6 +164,10 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                 }
 
                 default: {
+                    if (attrib < ITEM_ATTR_FIRST || attrib > ITEM_ATTR_LAST) {
+                        std::cout << "[OtbLoader::loadFromOtb] Unknown item attr "
+                                  << static_cast<int>(attrib) << ", skip " << static_cast<int>(datalen) << " data\n";
+                    }
                     //skip unknown attributes
                     if (!stream.skip(datalen)) {
                         return false;
@@ -207,6 +211,7 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
             case ITEM_GROUP_PODIUM:
                 break;
             default:
+                std::cout << "[OtbLoader::loadFromOtb] Unknown item group " << static_cast<int>(itemNode.type) << std::endl;
                 return false;
         }
 
