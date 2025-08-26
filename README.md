@@ -4,9 +4,10 @@ Succesfully loads ``.dat`` and ``.otb`` of Tibia protocol 10.98, and this projec
 
 
 ***================================================================================***
+
 ***Notes from comparing .dat and .otb, that hopefully will lead to removal of .otb***
-.otb format is deemed to not implementing anything new, it's just a bridge for a useless system of client-id and server-id which was allegedly created because of some weird
-item removal YEARS ago. .otb does not contain anything additional other than *alwaysOnTopOrder=ITEM_ATTR_TOPORDER*, which is calculated anyway based on `type` from .dat.
+`.otb` format is deemed to not be implementing anything new, it's just a bridge for a unnecessary convention of client-id and server-id which was allegedly created because of some weird
+item removal YEARS ago. `.otb` does not contain anything additional other than *alwaysOnTopOrder=ITEM_ATTR_TOPORDER*, which is calculated anyway based on `type` from .dat.
 
 The `.dat` code in question related to stack order:
 ```
@@ -32,7 +33,7 @@ The `.dat` code in question related to stack order:
 ```
 
 Analysis on other attributes of .otb that were suspected to be custom, but are not:
-- WareID - matches with show-as trade-as from .dat's market.
+- WareID - matches with `Trade as` from .dat's market.
 - Type - ground, podium etc. - taken from .dat
 - Name - the name is market.name from .dat
 - Classification - deprecated
