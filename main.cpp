@@ -45,7 +45,7 @@ int main() {
     if(!datOtbMatch) {
         std::cerr << "Result: The files .dat and .otb are NOT matching!\n";
     } else {
-        std::cout << "Result: .dat and .otb are matching, properly loaded too!";
+        std::cout << "Result: .dat and .otb are matching, properly loaded too!\n";
     }
 
     std::cout << "==== Duplicate Check =====\n";
