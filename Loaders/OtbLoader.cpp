@@ -162,6 +162,26 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                     break;
                 }
 
+                case ITEM_ATTR_NAME: {
+                    if (datalen == 0) {
+                        return false;
+                    }
+
+                    if (stream.size() < datalen) {
+                        return false;
+                    }
+
+                    std::string itemName;
+                    itemName.resize(datalen);
+
+                    if (!stream.readBytes(itemName.data(), datalen)) {
+                        return false;
+                    }
+
+                    //std::cout << "[Noticing - Items::loadFromOtb] Name " << itemName << " for cid " << clientId << std::endl;
+                    break;
+                }
+
                 case ITEM_ATTR_CLASSIFICATION: {
                     uint8_t classification;
                     if (!stream.read(classification)) {

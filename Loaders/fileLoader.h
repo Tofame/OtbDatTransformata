@@ -100,6 +100,15 @@ public:
         return true;
     }
 
+    bool readBytes(void* dest, size_t n) {
+        if (size() < n) {
+            return false;
+        }
+        memcpy(dest, p, n);
+        p += n;
+        return true;
+    }
+
 private:
     const char* p = nullptr;
     const char* end = nullptr;
