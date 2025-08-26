@@ -158,7 +158,8 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                     if (!stream.read<uint16_t>(wareId)) {
                         return false;
                     }
-                    //std::cout << "[Noticing - Items::loadFromOtb] WareId " << wareId << std::endl;
+
+                    //std::cout << "[Noticing - Items::loadFromOtb] WareId " << wareId << " for cid " << clientId << std::endl;
                     break;
                 }
 
