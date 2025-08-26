@@ -80,69 +80,211 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
         // other stuff for other protocols...
 
         switch(attr) {
-            case ThingAttrDisplacement: {
-                uint16_t m_displacementX;
-                uint16_t m_displacementY;
-                fin.read(reinterpret_cast<char*>(&m_displacementX), 2);
-                fin.read(reinterpret_cast<char*>(&m_displacementY), 2);
-                // m_attribs.set(attr, true); // or store x/y if needed
+            case ThingAttrGround: {
+                itemType.isGround = true;
+                uint16_t groundSpeed;
+                fin.read(reinterpret_cast<char*>(&groundSpeed), 2);
+                itemType.groundSpeed = groundSpeed;
                 break;
             }
+
+            case ThingAttrGroundBorder:
+                itemType.isGroundBorder = true;
+                break;
+
+            case ThingAttrOnBottom:
+                itemType.isOnBottom = true;
+                break;
+
+            case ThingAttrOnTop:
+                itemType.isOnTop = true;
+                break;
+
+            case ThingAttrContainer:
+                itemType.isContainer = true;
+                break;
+
+            case ThingAttrStackable:
+                itemType.stackable = true;
+                break;
+
+            case ThingAttrForceUse:
+                itemType.forceUse = true;
+                break;
+
+            case ThingAttrMultiUse:
+                itemType.multiUse = true;
+                break;
+
+            case ThingAttrFluidContainer:
+                itemType.isFluidContainer = true;
+                break;
+            case ThingAttrSplash: // fluid (splash)
+                itemType.isFluid = true;
+                break;
+
+            // ---- blocking / pathing ----
+            case ThingAttrNotWalkable:
+                itemType.isUnpassable = true;
+                itemType.blockSolid   = true;
+                break;
+            case ThingAttrNotMoveable:
+                itemType.isUnmoveable = true;
+                itemType.moveable     = false;
+                break;
+            case ThingAttrBlockProjectile:
+                itemType.blockMissile    = true; // blockProjectile
+                break;
+            case ThingAttrNotPathable:
+                itemType.blockPathfind = true;
+                break;
+
+            case ThingAttrWritable: {
+                itemType.writable = true;
+                uint16_t maxLen;
+                fin.read(reinterpret_cast<char*>(&maxLen), 2);
+                itemType.maxTextLength = maxLen;
+                break;
+            }
+
+            case ThingAttrWritableOnce: {
+                itemType.writableOnce = true;
+                uint16_t maxLen;
+                fin.read(reinterpret_cast<char*>(&maxLen), 2);
+                itemType.maxTextLength = maxLen;
+                break;
+            }
+
+            case ThingAttrMinimapColor: {
+                uint16_t color;
+                fin.read(reinterpret_cast<char*>(&color), 2);
+                itemType.miniMap = true;
+                itemType.miniMapColor = static_cast<uint8_t>(color);
+                break;
+            }
+
+            case ThingAttrCloth: {
+                uint16_t clothSlot;
+                fin.read(reinterpret_cast<char*>(&clothSlot), 2);
+                itemType.cloth = true;
+                itemType.clothSlot = clothSlot;
+                break;
+            }
+
+            case ThingAttrLensHelp: {
+                uint16_t id;
+                fin.read(reinterpret_cast<char*>(&id), 2);
+                itemType.isLensHelp = true;
+                itemType.lensHelp = id;
+                break;
+            }
+
+            case ThingAttrUsable: {
+                uint16_t val;
+                fin.read(reinterpret_cast<char*>(&val), 2);
+                itemType.usable = true;
+                break;
+            }
+
+            case ThingAttrPickupable:
+                itemType.pickupable = true;
+                break;
+
             case ThingAttrLight: {
-                //Light light;
                 uint16_t intensity, color;
                 fin.read(reinterpret_cast<char*>(&intensity), 2);
                 fin.read(reinterpret_cast<char*>(&color), 2);
-//                light.intensity = intensity;
-//                light.color = color;
-//                m_attribs.set(attr, light);
+                itemType.hasLight = true;
+                itemType.lightLevel = static_cast<uint8_t>(intensity);
+                itemType.lightColor = static_cast<uint8_t>(color);
                 break;
             }
-            case ThingAttrMarket: {
-                // Move it at later, it's 1:30AM...
-                struct MarketData {
-                    std::string name;
-                    int category;
-                    uint16_t requiredLevel;
-                    uint16_t restrictVocation;
-                    uint16_t showAs;
-                    uint16_t tradeAs;
-                };
-                MarketData market;
-                uint16_t len;
-                fin.read(reinterpret_cast<char*>(&market.category), 2);
-                fin.read(reinterpret_cast<char*>(&market.tradeAs), 2);
-                fin.read(reinterpret_cast<char*>(&market.showAs), 2);
-                fin.read(reinterpret_cast<char*>(&len), 2);
 
-                market.name.resize(len);
-                fin.read(&market.name[0], len);
-
-                fin.read(reinterpret_cast<char*>(&market.restrictVocation), 2);
-                fin.read(reinterpret_cast<char*>(&market.requiredLevel), 2);
-
-                //m_attribs.set(attr, market);
+            case ThingAttrDisplacement: {
+                uint16_t dx, dy;
+                fin.read(reinterpret_cast<char*>(&dx), 2);
+                fin.read(reinterpret_cast<char*>(&dy), 2);
+                itemType.hasOffset = true;
+                itemType.offsetX = dx;
+                itemType.offsetY = dy;
                 break;
             }
+
             case ThingAttrElevation: {
                 uint16_t elevation;
                 fin.read(reinterpret_cast<char*>(&elevation), 2);
-                //m_elevation = elevation;
-                //m_attribs.set(attr, elevation);
+                itemType.hasElevation = true;
+                itemType.elevation = elevation;
                 break;
             }
-            case ThingAttrUsable:
-            case ThingAttrGround:
-            case ThingAttrWritable:
-            case ThingAttrWritableOnce:
-            case ThingAttrMinimapColor:
-            case ThingAttrCloth:
-            case ThingAttrLensHelp: {
-                uint16_t val;
-                fin.read(reinterpret_cast<char*>(&val), 2);
-                //m_attribs.set(attr, val);
+
+            case ThingAttrMarket: {
+                itemType.isMarketItem = true;
+                uint16_t len;
+                fin.read(reinterpret_cast<char*>(&itemType.marketCategory), 2);
+                fin.read(reinterpret_cast<char*>(&itemType.marketTradeAs), 2);
+                fin.read(reinterpret_cast<char*>(&itemType.marketShowAs), 2);
+                fin.read(reinterpret_cast<char*>(&len), 2);
+
+                itemType.marketName.resize(len);
+                fin.read(&itemType.marketName[0], len);
+
+                fin.read(reinterpret_cast<char*>(&itemType.marketRestrictProfession), 2);
+                fin.read(reinterpret_cast<char*>(&itemType.marketRestrictLevel), 2);
                 break;
             }
+
+            case ThingAttrNoMoveAnimation:
+                itemType.noMoveAnimation = true;
+                break;
+
+            // ---- hangable / hooks / rotation ----
+            case ThingAttrHangable:
+                itemType.isHangable = true; // you also have `hangable`; set both if you want
+                itemType.hangable   = true;
+                break;
+            case ThingAttrHookSouth:
+                itemType.isVertical = true;
+                break;
+            case ThingAttrHookEast:
+                itemType.isHorizontal = true;
+                break;
+            case ThingAttrRotateable:
+                itemType.rotatable = true;
+                break;
+
+            // ---- visibility / translucency ----
+            case ThingAttrDontHide:
+                itemType.dontHide = true;
+                break;
+            case ThingAttrTranslucent:
+                itemType.isTranslucent = true;
+                break;
+
+            // ---- corpse/anim ----
+            case ThingAttrLyingCorpse:
+                itemType.isLyingObject = true;
+                break;
+            case ThingAttrAnimateAlways:
+                itemType.animateAlways = true;
+                break;
+
+            // ---- full ground / look ----
+            case ThingAttrFullGround:
+                itemType.isFullGround = true;
+                break;
+            case ThingAttrLook:
+                itemType.ignoreLook = true;
+                break;
+
+            case ThingAttrWrapable:
+                itemType.wrappable = true;
+                break;
+
+            case ThingAttrUnwrapable:
+                itemType.unwrappable = true;
+                break;
+
             case ThingAttrBones: {
                 //std::vector<Point> m_bones;
                 //m_bones.resize(4);
@@ -153,22 +295,13 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                     //m_bones[dir] = Point(x, y); // assuming Point(x, y) is a thing
                 }
                 //m_attribs.set(attr, true);
+                std::cout << "Notices: bones detected, but rn not supported!\n";
                 break;
             }
 
-            // Custom, quickly, just to prove, TO-DO make m_attribs.set
-            case ThingAttrPickupable:
-                itemType.pickupable = true;
-                break;
-                //m_attribs.set(attr, true);
             default:
-                if(not
-                    ((attr >= ThingAttrGround and attr <= ThingAttrDontCenterOutfit) or
-                    (attr >= ThingAttrOpacity and attr <= ThingAttrNotPreWalkable) or
-                    (attr >= ThingAttrDefaultAction and attr <=ThingLastAttr)))
-                {
-                    std::cout << "[DatLoader::unserialize] Unknown attribute spotted: " << static_cast<int>(attr) << std::endl;
-                }
+                std::cout << "[DatLoader::unserialize] Unknown attribute: "
+                          << static_cast<int>(attr) << std::dec << "\n";
                 break;
         }
     }

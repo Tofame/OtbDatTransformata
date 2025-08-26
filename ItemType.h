@@ -127,8 +127,6 @@ public:
     bool walkStack = true;
     bool blockSolid = false;
     bool blockPickupable = false;
-    bool blockProjectile = false;
-    bool blockPathFind = false;
     bool allowPickupable = false;
     bool showDuration = false;
     bool showCharges = false;
@@ -165,7 +163,7 @@ public:
     bool isFluid = false;
     bool isUnpassable = false;
     bool isUnmoveable = false;
-    bool blockMissile = false;
+    bool blockMissile = false; // blockProjectile
     bool blockPathfind = false;
     bool noMoveAnimation = false;
     bool isTranslucent = false;
