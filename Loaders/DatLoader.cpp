@@ -299,6 +299,13 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                 break;
             }
 
+            case ThingAttrDefaultAction:
+                uint8_t defaultaction;
+                fin.read(reinterpret_cast<char*>(&defaultaction), 1);
+                itemType.hasDefaultAction = true;
+                itemType.defaultAction = defaultaction;
+                break;
+
             default:
                 std::cout << "[DatLoader::unserialize] Unknown attribute: "
                           << static_cast<int>(attr) << std::dec << "\n";
