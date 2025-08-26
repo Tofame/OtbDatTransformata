@@ -143,7 +143,10 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                     if (!stream.read<uint8_t>(alwaysOnTopOrder)) {
                         return false;
                     }
-                    std::cout << "Noticed: " << alwaysOnTopOrder << std::endl;
+                    // None, Border, Bottom, Top
+                    if(alwaysOnTopOrder < 0 or alwaysOnTopOrder > 3) {
+                        std::cout << "[Noticed alwaysOnTopOrder]: " << static_cast<int>(alwaysOnTopOrder) << std::endl;
+                    }
                     break;
                 }
 
