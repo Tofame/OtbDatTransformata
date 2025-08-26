@@ -6,11 +6,6 @@
 
 // 10.98 .dat compiler
 void DatCompiler::compile(DatLoader& datLoader) {
-    // For custom compiled we will have to tweak by hand.
-    bool extended = g_protocolVersion >= 960;
-    bool frameDurations = g_protocolVersion >= 1050;
-    bool frameGroups = g_protocolVersion >= 1057;
-
     std::unique_ptr<MetadataWriter> metaWriter;
     if(g_protocolVersion > 986) {
         std::unique_ptr<MetadataWriter> metaWriter(new MetadataWriter6());

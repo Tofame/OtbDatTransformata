@@ -14,7 +14,7 @@ protected:
         return false;
     };
 
-    void writeTexturePatterns(PropWriteStream& writer, ItemType& it, bool extended = false, bool frameDurations = false, bool frameGroups = false)
+    void writeTexturePatterns(PropWriteStream& writer, ItemType& it, bool extended = g_extended, bool frameDurations = g_frameDurations, bool frameGroups = g_frameGroups)
     {
         uint8_t groupCount = 1;
 //        if(frameGroups && type.category == ThingCategory.OUTFIT) {
