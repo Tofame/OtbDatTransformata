@@ -15,4 +15,6 @@ private:
     bool m_datLoaded = false;
     uint32_t m_datSignature = 0;
     uint16_t m_contentRevision = 0;
+
+    std::vector<char> m_rawRest;
 };

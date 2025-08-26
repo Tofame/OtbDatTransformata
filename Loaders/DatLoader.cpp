@@ -7,6 +7,7 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
     m_datSignature = 0;
     m_contentRevision = 0;
+    m_rawRest.clear();
 
     try {
         // Otcv8 was 'guessing' the path here, we just tell it in the param
@@ -27,17 +28,27 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
         fin.read(reinterpret_cast<char *>(&outfitCount), sizeof(outfitCount));
         fin.read(reinterpret_cast<char *>(&effectCount), sizeof(effectCount));
         fin.read(reinterpret_cast<char *>(&distanceCount), sizeof(distanceCount));
+
+        // Load items
         auto &itemTypesDat = items.getItemTypesDat();
         itemTypesDat.resize(itemCount + 1);
-
-        // .dat items start at 100
-        uint16_t firstId = 100;
+        uint16_t firstId = 100; // .dat items start at 100
 
         for (uint16_t id = firstId; id < itemTypesDat.size(); ++id) {
             auto type = ItemType();
             unserialize(type, id, fin);
             itemTypesDat[id] = type;
         }
+
+        // Preserve remaining bytes (outfits, effects, missiles)
+        std::streampos restStart = fin.tellg();
+        fin.seekg(0, std::ios::end);
+        std::streampos restEnd = fin.tellg();
+        size_t restSize = static_cast<size_t>(restEnd - restStart);
+
+        m_rawRest.resize(restSize);
+        fin.seekg(restStart, std::ios::beg);
+        fin.read(m_rawRest.data(), restSize);
 
         m_datLoaded = true;
         return true;
