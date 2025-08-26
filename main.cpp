@@ -50,5 +50,17 @@ int main() {
 
     std::cout << "==== Duplicate Check =====\n";
     //items.checkDuplicatedClientIds();
+
+    std::cout << "==== Check if there is any otb it that doesnt point to dat item =====\n";
+    for(auto& _it : otbItems) {
+        try {
+            auto &datItem = datItems.at(_it.clientId);
+        } catch (const std::exception& e) {
+            std::cout << "Found otb with clientId " << _it.clientId
+                      << " that has no dat item\n";
+            break;
+        }
+    }
+    std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
     return 0;
 }
