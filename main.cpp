@@ -48,5 +48,7 @@ int main() {
         std::cout << "Result: .dat and .otb are matching, properly loaded too!";
     }
 
+    std::cout << "==== Duplicate Check =====\n";
+    //items.checkDuplicatedClientIds();
     return 0;
 }
