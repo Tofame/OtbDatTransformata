@@ -32,7 +32,7 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
         // Load items
         auto &itemTypesDat = items.getItemTypesDat();
         itemTypesDat.resize(m_loadedItemsCount + 1);
-        uint16_t firstId = 100; // .dat items start at 100
+        uint16_t firstId = g_MIN_ITEM_ID; // .dat items start at 100
 
         for (uint16_t id = firstId; id < itemTypesDat.size(); ++id) {
             auto type = ItemType();

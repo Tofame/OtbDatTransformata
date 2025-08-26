@@ -4,7 +4,7 @@
 #include "../Loaders/fileLoader.h"
 
 class MetadataWriter {
-protected:
+public:
     virtual bool writeProperties(const ItemType& type, PropWriteStream& stream) {
         std::cout << "[ERROR::writeProperties] Use descendants of MetadataWriter\n";
         return false;
@@ -14,7 +14,7 @@ protected:
         return false;
     };
 
-    void writeTexturePatterns(PropWriteStream& writer, ItemType& it, bool extended = g_extended, bool frameDurations = g_frameDurations, bool frameGroups = g_frameGroups)
+    void writeTexturePatterns(ItemType& it, PropWriteStream& writer, bool extended = g_extended, bool frameDurations = g_frameDurations, bool frameGroups = g_frameGroups)
     {
         uint8_t groupCount = 1;
 //        if(frameGroups && type.category == ThingCategory.OUTFIT) {
