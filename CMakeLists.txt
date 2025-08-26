@@ -19,9 +19,11 @@ add_executable(OtbDatTransformata main.cpp
         Loaders/DatAttributes.h
         globals.h
         Compilers/DatCompiler.h
+        Compilers/DatCompiler.cpp
         Compilers/MetadataWriter.h
         Compilers/MetadataWriter6.h
         Compilers/MetadataFlags6.h
         Compilers/ThingCategory.h
         Compilers/MetadataReader.h
+        FrameGroup.h
 )

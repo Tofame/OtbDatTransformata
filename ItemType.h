@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include "Loaders/itemLoader_enums.h"
+#include "FrameGroup.h"
 #include <fstream>
 
 enum SlotPositionBits : uint32_t {
@@ -197,7 +198,21 @@ public:
     uint16_t lensHelp = 0;
     bool usable = false;
 
-    // Dat properties
-    uint8_t height;
-    uint8_t width;
+    std::vector<FrameGroup> frameGroups;
+    // Get a FrameGroup at a given index
+    FrameGroup& getFrameGroup(uint32_t groupType) {
+        if(groupType >= frameGroups.size()) {
+            throw std::out_of_range("Invalid frame group index");
+        }
+        return frameGroups[groupType];
+    }
+    // Set a FrameGroup at a given index
+    void setFrameGroup(uint32_t groupType, const FrameGroup& frameGroup) {
+        // Ensure vector is large enough
+        if(groupType >= frameGroups.size()) {
+            frameGroups.resize(groupType + 1); // Default-construct missing elements
+        }
+        frameGroups[groupType] = frameGroup;
+        frameGroups[groupType].type = groupType;
+    }
 };

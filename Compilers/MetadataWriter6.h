@@ -11,7 +11,7 @@ class MetadataWriter6 : public MetadataWriter
 public:
     MetadataWriter6() = default;
 
-    bool writeProperties(const ItemType& type, PropWriteStream& stream)
+    bool writeProperties(const ItemType& type, PropWriteStream& stream) override
     {
         // Right now we only save items anyway.
         if(true) {
@@ -43,7 +43,7 @@ public:
         return true;
     }
 
-    bool writeItemProperties(const ItemType& type, PropWriteStream& stream)
+    bool writeItemProperties(const ItemType& type, PropWriteStream& stream) override
     {
         // Right now we only save items anyway.
 //        if (type.category != ThingCategory::ITEM)

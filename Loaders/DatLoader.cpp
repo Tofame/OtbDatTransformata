@@ -2,6 +2,7 @@
 #include <iostream>
 #include "DatLoader.h"
 #include "DatAttributes.h"
+#include "../globals.h"
 
 bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
@@ -23,15 +24,14 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
         m_contentRevision = static_cast<uint16_t>(m_datSignature);
 
         // Read the item count, outfit count, effect count, missiles count (distance effects)
-        uint16_t itemCount = 0, outfitCount = 0, effectCount = 0, distanceCount = 0;
-        fin.read(reinterpret_cast<char *>(&itemCount), sizeof(itemCount));
-        fin.read(reinterpret_cast<char *>(&outfitCount), sizeof(outfitCount));
-        fin.read(reinterpret_cast<char *>(&effectCount), sizeof(effectCount));
-        fin.read(reinterpret_cast<char *>(&distanceCount), sizeof(distanceCount));
+        fin.read(reinterpret_cast<char *>(&m_loadedItemsCount), sizeof(m_loadedItemsCount));
+        fin.read(reinterpret_cast<char *>(&m_loadedOutfitsCount), sizeof(m_loadedOutfitsCount));
+        fin.read(reinterpret_cast<char *>(&m_loadedEffectsCount), sizeof(m_loadedEffectsCount));
+        fin.read(reinterpret_cast<char *>(&m_loadedMissilesCount), sizeof(m_loadedMissilesCount));
 
         // Load items
         auto &itemTypesDat = items.getItemTypesDat();
-        itemTypesDat.resize(itemCount + 1);
+        itemTypesDat.resize(m_loadedItemsCount + 1);
         uint16_t firstId = 100; // .dat items start at 100
 
         for (uint16_t id = firstId; id < itemTypesDat.size(); ++id) {
@@ -317,36 +317,103 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
         throw std::runtime_error("Couldn't finish unserializing attributes in: " + itemType.clientId);
 
     // Read sprite data
-    itemType.width = fin.get();
-    itemType.height = fin.get();
-    if(itemType.width > 1 || itemType.height > 1) {
-        fin.get(); // realSize
-    }
-    uint8_t layers = fin.get();
-    uint8_t patternX = fin.get();
-    uint8_t patternY = fin.get();
-    uint8_t patternZ = fin.get();
-    uint8_t animationPhases = fin.get();
+    uint8_t groupCount = 1;
+//    if(frameGroups && type.category == ThingCategory.OUTFIT) {
+//        groupCount = readUnsignedByte();
+//    }
+    uint32_t i;
+    uint8_t groupType;
+    FrameGroup frameGroup = FrameGroup();
 
-    if(animationPhases > 1) { // && g_game.getFeature(Otc::GameEnhancedAnimations), which is >= 1050
-        uint8_t m_async = fin.get();
-        uint32_t m_loopCount = 0;
-        fin.read(reinterpret_cast<char*>(&m_loopCount), sizeof(m_loopCount));
-        uint8_t m_startPhase = fin.get();
-
-        for(int i = 0; i < animationPhases; ++i) {
-            uint32_t minimum = 0;
-            fin.read(reinterpret_cast<char*>(&minimum), sizeof(minimum));
-            uint32_t maximum = 0;
-            fin.read(reinterpret_cast<char*>(&maximum), sizeof(maximum));
+    for(groupType = 0; groupType < groupCount; groupType++) {
+        frameGroup.width = fin.get();
+        frameGroup.height = fin.get();
+        if (frameGroup.width > 1 || frameGroup.height > 1) {
+            frameGroup.exactSize = fin.get(); // realSize, exactSize
+        } else {
+            // not really needed for our app, OB would use it probably (?), however Writer won't use it anyway
+            // only uses it when: frameGroup.width > 1 || frameGroup.height > 1
+            frameGroup.exactSize = g_SpritesExactSize;
         }
-    }
 
-    // Skip sprite IDs
-    uint32_t spriteCount = itemType.width * itemType.height * layers * patternX * patternY * patternZ * animationPhases;
-    if(/* clientVersion >= */ true) { // U32 sprites, extended type shii
-        fin.ignore(spriteCount * 4);
-    } else {
-        fin.ignore(spriteCount * 2);
+        frameGroup.layers = fin.get();
+        frameGroup.patternX = fin.get();
+        frameGroup.patternY = fin.get();
+        frameGroup.patternZ = fin.get();
+        frameGroup.frames = fin.get(); // animationPhases
+
+        if (frameGroup.frames > 1) { // && g_game.getFeature(Otc::GameEnhancedAnimations), which is >= 1050
+            frameGroup.isAnimation = true;
+            frameGroup.frameDurations = std::vector<FrameDuration>(frameGroup.frames);
+            //uint8_t m_async = fin.get(); // m_async
+            //uint32_t m_loopCount = 0; // m_loopCount
+            //fin.read(reinterpret_cast<char *>(&m_loopCount), sizeof(m_loopCount));
+            //uint8_t m_startPhase = fin.get();
+
+            // Maybe irrevelant check here? or a pointer vector should be implemented to check for nullptr vector.
+            //if (!frameGroup.frameDurations.empty()) {
+                frameGroup.animationMode = (AnimationMode)fin.get();
+                fin.read(reinterpret_cast<char*>(&frameGroup.loopCount), sizeof(frameGroup.loopCount));
+                frameGroup.startFrame = fin.get();
+
+                for (int i = 0; i < frameGroup.frames; ++i) {
+                    uint32_t minimum = 0;
+                    fin.read(reinterpret_cast<char *>(&minimum), sizeof(minimum));
+                    uint32_t maximum = 0;
+                    fin.read(reinterpret_cast<char *>(&maximum), sizeof(maximum));
+                    frameGroup.frameDurations[i] = FrameDuration(minimum, maximum);
+                }
+            //}
+        }
+
+        // Sprite IDs
+        // itemType.width * itemType.height * layers * patternX * patternY * patternZ * animationPhases
+        //uint32_t totalSprites = frameGroup.getTotalSprites();
+        uint32_t totalSprites = frameGroup.getTotalSprites();
+        constexpr uint32_t MAX_SPRITES = 1000000; // pick a safe upper bound
+        if (totalSprites > MAX_SPRITES) {
+            throw std::runtime_error("Item has too many sprites: " + std::to_string(totalSprites));
+        }
+
+        // Calculate the number of bytes to read for sprites
+        const size_t bytesToRead = totalSprites * (g_extended ? sizeof(uint32_t) : sizeof(uint16_t));
+        std::streampos currentPos = fin.tellg();
+        fin.seekg(0, std::ios::end);
+        std::streampos endPos = fin.tellg();
+        fin.seekg(currentPos, std::ios::beg);
+
+        if (static_cast<size_t>(endPos - currentPos) < bytesToRead) {
+            throw std::runtime_error("Not enough data in DAT file to read all sprites for item " + std::to_string(itemType.clientId) +
+                                     ". Expected " + std::to_string(bytesToRead) + " bytes, but only " + std::to_string(endPos - currentPos) + " remain.");
+        }
+
+        frameGroup.spriteIndex.resize(totalSprites);
+        //std::cout << "Total sprites " << totalSprites << "\n";
+
+        //fin.ignore(totalSprites * sizeof(uint32_t));
+        for (i = 0; i < totalSprites; i++) {
+            if (g_extended) {
+                uint32_t spId = 0;
+                if (!fin.read(reinterpret_cast<char*>(&spId), sizeof(spId))) {
+                    throw std::runtime_error("Failed to read extended sprite index " + std::to_string(i) +
+                                             " for item " + std::to_string(itemType.clientId) + " spId " + std::to_string(spId));
+                }
+                frameGroup.spriteIndex[i] = spId;
+            } else {
+                uint16_t spId = 0;
+                fin.read(reinterpret_cast<char *>(&spId), sizeof(spId));
+                frameGroup.spriteIndex[i] = spId;
+            }
+        }
+
+        itemType.setFrameGroup(groupType, frameGroup);
+
+        // Skip sprite IDs
+//        uint32_t spriteCount = frameGroup.width * frameGroup.height * frameGroup.layers * frameGroup.patternX * frameGroup.patternY * frameGroup.patternZ * frameGroup.frames;
+//        if(/* clientVersion >= */ true) { // U32 sprites, extended type shii
+//            fin.ignore(spriteCount * 4);
+//        } else {
+//            fin.ignore(spriteCount * 2);
+//        }
     }
 }
