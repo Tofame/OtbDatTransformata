@@ -30,6 +30,10 @@ void DatCompiler::compile(DatLoader& datLoader, Items& items) {
         metaWriter->writeTexturePatterns(dat_it, writer);
     }
 
+    // Dump the preserved outfits/effects/missiles bytes
+    const auto& restBytes = datLoader.getBytesOfTheRestOfDat();
+    writer.writeBytes(restBytes.data(), restBytes.size());
+
     if (!writer.saveToFile(g_compileDatPath)) {
         std::cerr << "Failed to save file\n";
     }

@@ -23,7 +23,7 @@ public:
 //        }
 
         uint8_t i;
-        uint8_t groupType;
+        uint8_t groupType = 0;
         for(groupType = 0; groupType < groupCount; groupType++)
         {
 //            if(frameGroups && type.category == ThingCategory.OUTFIT)
@@ -35,7 +35,7 @@ public:
 //                writeByte(group);
 //            }
 
-            auto frameGroup = it.getFrameGroup(groupType);
+            auto& frameGroup = it.getFrameGroup(groupType);
             writer.write<uint8_t>(frameGroup.width);  // Write width
             writer.write<uint8_t>(frameGroup.height); // Write height
 

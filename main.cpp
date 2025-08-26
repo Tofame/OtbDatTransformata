@@ -3,6 +3,7 @@
 #include "Items.h"
 #include "Loaders/OtbLoader.h"
 #include "Loaders/DatLoader.h"
+#include "Compilers/DatCompiler.h"
 
 int main() {
     auto items = Items();
@@ -62,5 +63,9 @@ int main() {
         }
     }
     std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
+
+    std::cout << "\n=====Start compiling\n";
+    DatCompiler datCompiler;
+    datCompiler.compile(datLoader, items);
     return 0;
 }

@@ -156,6 +156,10 @@ public:
         out.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         return true;
     }
+
+    void writeBytes(const char* data, size_t size) {
+        buffer.insert(buffer.end(), data, data + size);
+    }
 private:
     std::vector<char> buffer;
 };

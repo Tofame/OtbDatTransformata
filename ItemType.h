@@ -202,7 +202,17 @@ public:
     // Get a FrameGroup at a given index
     FrameGroup& getFrameGroup(uint32_t groupType) {
         if(groupType >= frameGroups.size()) {
-            throw std::out_of_range("Invalid frame group index");
+            auto _group = FrameGroup();
+//            if (category == ThingCategory.MISSILE)
+//            {
+//                _group.patternX = 3;
+//                _group.patternY = 3;
+//            }
+            _group.spriteIndex.resize(_group.getTotalSprites());
+            this->setFrameGroup(groupType, _group);
+
+            // Should've been using: but ehhh that.
+            //throw std::out_of_range("Invalid frame group index. Size: " + std::to_string(frameGroups.size()));
         }
         return frameGroups[groupType];
     }
