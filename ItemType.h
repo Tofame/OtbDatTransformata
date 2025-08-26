@@ -94,7 +94,7 @@ public:
     uint16_t transformToOnUse[2] = {0, 0};
     uint16_t transformToFree = 0;
     uint16_t destroyTo = 0;
-    uint16_t maxTextLen = 0;
+    uint16_t maxTextLength = 0;
     uint16_t writeOnceItemId = 0;
     uint16_t transformEquipTo = 0;
     uint16_t transformDeEquipTo = 0;
@@ -148,6 +148,56 @@ public:
     bool lookThrough = false;
     bool stopTime = false;
     bool showCount = true;
+
+    // Added to make it possible to compile .dat based on items.
+    bool hasLight = false;
+    bool hasOffset = false;
+    uint16_t offsetX = 0;
+    uint16_t offsetY = 0;
+    bool animateAlways = false;
+    bool isGround = false;
+    bool isGroundBorder = false;
+    uint16_t groundSpeed = 0;
+    bool isOnBottom = false;
+    bool isOnTop = false;
+    bool isContainer = false;
+    bool isFluidContainer = false;
+    bool isFluid = false;
+    bool isUnpassable = false;
+    bool isUnmoveable = false;
+    bool blockMissile = false;
+    bool blockPathfind = false;
+    bool noMoveAnimation = false;
+    bool isTranslucent = false;
+    bool hasElevation = false;
+    uint16_t elevation = 0;
+    bool isLyingObject = false;
+    bool isFullGround = false;
+    bool ignoreLook = false;
+    bool cloth = false;
+    uint16_t clothSlot = 0;
+    bool isMarketItem = false;
+    uint16_t marketCategory = 0;
+    uint16_t marketTradeAs = 0;
+    uint16_t marketShowAs = 0;
+    std::string marketName;
+    uint16_t marketRestrictProfession = 0;
+    uint16_t marketRestrictLevel = 0;
+    bool hasDefaultAction = false;
+    uint16_t defaultAction = 0;
+    bool wrappable = false;
+    bool unwrappable = false;
+    bool bottomEffect = false;
+    bool multiUse = false;
+    bool writable = false;
+    bool writableOnce = false;
+    bool hangable = false;
+    bool dontHide = false;
+    bool miniMap = false;
+    uint8_t miniMapColor = 0;
+    bool isLensHelp = false;
+    uint16_t lensHelp = 0;
+    bool usable = false;
 
     // Dat properties
     uint8_t height;

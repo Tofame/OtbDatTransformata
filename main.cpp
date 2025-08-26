@@ -29,10 +29,10 @@ int main() {
         try {
             auto& datItem = datItems.at(otbItem.clientId);
 
-            if(otbItem.pickupable) {
+            if(datItem.pickupable) {
                 if(!datItem.pickupable) {
                     datOtbMatch = false;
-                    std::cerr << "Cid " << otbItem.clientId << " " << datItem.clientId << " Sid " << otbItem.id << " are not matching pickupable (ERROR)!\n";
+                    std::cerr << "Cid " << otbItem.clientId << " " << datItem.clientId << " Sid " << otbItem.id << " are not matching pickupable (.dat side) (ERROR)!\n";
                 }
             }
         } catch (const std::exception& e) {

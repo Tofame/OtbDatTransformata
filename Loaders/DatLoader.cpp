@@ -2,6 +2,7 @@
 #include <iostream>
 #include "DatLoader.h"
 #include "DatAttributes.h"
+#include "../Compilers/MetadataFlags6.h"
 
 bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
@@ -61,45 +62,44 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
 void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin) {
     itemType.clientId = cid;
 
-    int count = 0, attr = -1;
+    int count = 0;
+    uint8_t attr = 0;
     bool done = false;
-    for(int i = 0; i < ThingLastAttr; ++i) {
+    for(int i = 0; i < MetadataFlags6::LAST_FLAG; ++i) {
         count++;
         attr = fin.get();
-        if(attr == ThingLastAttr) {
+        if(attr == MetadataFlags6::LAST_FLAG) {
             done = true;
             break;
         }
 
-        // if(g_game.getClientVersion() >= 1000) {
-        if(attr == 16)
-            attr = ThingAttrNoMoveAnimation;
-        else if(attr > 16)
+        if(attr > 16)
             attr -= 1;
-        //} else if (g_game.getClientVersion() >= 780) {
-        // other stuff for other protocols...
 
-        switch(attr) {
-            case ThingAttrDisplacement: {
-                uint16_t m_displacementX;
-                uint16_t m_displacementY;
+        switch (attr) {
+            case MetadataFlags6::HAS_OFFSET: { // ThingAttrDisplacement
+                uint16_t m_displacementX, m_displacementY;
                 fin.read(reinterpret_cast<char*>(&m_displacementX), 2);
                 fin.read(reinterpret_cast<char*>(&m_displacementY), 2);
-                // m_attribs.set(attr, true); // or store x/y if needed
+
+                itemType.hasOffset = true;
+                itemType.offsetX = m_displacementX;
+                itemType.offsetY = m_displacementY;
                 break;
             }
-            case ThingAttrLight: {
-                //Light light;
+
+            case MetadataFlags6::HAS_LIGHT: { // ThingAttrLight
                 uint16_t intensity, color;
                 fin.read(reinterpret_cast<char*>(&intensity), 2);
                 fin.read(reinterpret_cast<char*>(&color), 2);
-//                light.intensity = intensity;
-//                light.color = color;
-//                m_attribs.set(attr, light);
+
+                itemType.hasLight = true;
+                itemType.lightLevel = intensity;
+                itemType.lightColor = color;
                 break;
             }
-            case ThingAttrMarket: {
-                // Move it at later, it's 1:30AM...
+
+            case MetadataFlags6::MARKET_ITEM: { // ThingAttrMarket
                 struct MarketData {
                     std::string name;
                     int category;
@@ -110,6 +110,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                 };
                 MarketData market;
                 uint16_t len;
+
                 fin.read(reinterpret_cast<char*>(&market.category), 2);
                 fin.read(reinterpret_cast<char*>(&market.tradeAs), 2);
                 fin.read(reinterpret_cast<char*>(&market.showAs), 2);
@@ -121,29 +122,93 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                 fin.read(reinterpret_cast<char*>(&market.restrictVocation), 2);
                 fin.read(reinterpret_cast<char*>(&market.requiredLevel), 2);
 
-                //m_attribs.set(attr, market);
+                itemType.isMarketItem = true;
+                itemType.marketCategory = market.category;
+                itemType.marketTradeAs = market.tradeAs;
+                itemType.marketShowAs = market.showAs;
+                itemType.marketName = market.name;
+                itemType.marketRestrictProfession = market.restrictVocation;
+                itemType.marketRestrictLevel = market.requiredLevel;
                 break;
             }
-            case ThingAttrElevation: {
+
+            case MetadataFlags6::HAS_ELEVATION: { // ThingAttrElevation
                 uint16_t elevation;
                 fin.read(reinterpret_cast<char*>(&elevation), 2);
-                //m_elevation = elevation;
-                //m_attribs.set(attr, elevation);
+
+                itemType.hasElevation = true;
+                itemType.elevation = elevation;
                 break;
             }
-            case ThingAttrUsable:
-            case ThingAttrGround:
-            case ThingAttrWritable:
-            case ThingAttrWritableOnce:
-            case ThingAttrMinimapColor:
-            case ThingAttrCloth:
-            case ThingAttrLensHelp: {
+
+            case MetadataFlags6::USABLE:
+            case MetadataFlags6::WRITABLE:
+            case MetadataFlags6::WRITABLE_ONCE:
+            case MetadataFlags6::MINI_MAP:
+            case MetadataFlags6::CLOTH:
+            case MetadataFlags6::LENS_HELP: {
                 uint16_t val;
                 fin.read(reinterpret_cast<char*>(&val), 2);
-                //m_attribs.set(attr, val);
+
+                if (attr == MetadataFlags6::WRITABLE || attr == MetadataFlags6::WRITABLE_ONCE) {
+                    itemType.maxTextLength = val;
+                    itemType.writable = (attr == MetadataFlags6::WRITABLE);
+                    itemType.writableOnce = (attr == MetadataFlags6::WRITABLE_ONCE);
+                } else if (attr == MetadataFlags6::MINI_MAP) {
+                    itemType.miniMap = true;
+                    itemType.miniMapColor = val;
+                } else if (attr == MetadataFlags6::CLOTH) {
+                    itemType.cloth = true;
+                    itemType.clothSlot = val;
+                } else if (attr == MetadataFlags6::LENS_HELP) {
+                    itemType.isLensHelp = true;
+                    itemType.lensHelp = val;
+                } else if (attr == MetadataFlags6::USABLE) {
+                    itemType.usable = true;
+                }
                 break;
             }
-            case ThingAttrBones: {
+
+            case MetadataFlags6::GROUND: {
+                uint16_t groundSpeed;
+                fin.read(reinterpret_cast<char*>(&groundSpeed), 2);
+
+                itemType.isGround = true;
+                itemType.groundSpeed = groundSpeed;
+                break;
+            }
+
+            case MetadataFlags6::GROUND_BORDER: {
+                itemType.isGroundBorder = true;
+                break;
+            }
+
+            case MetadataFlags6::ON_BOTTOM: {
+                itemType.isOnBottom = true;
+                break;
+            }
+
+            case MetadataFlags6::ON_TOP: {
+                itemType.isOnTop = true;
+                break;
+            }
+
+            case MetadataFlags6::LYING_OBJECT: {
+                itemType.isLyingObject = true;
+                break;
+            }
+
+            case MetadataFlags6::ANIMATE_ALWAYS: {
+                itemType.animateAlways = true;
+                break;
+            }
+
+            case MetadataFlags6::PICKUPABLE: {
+                itemType.pickupable = true;
+                break;
+            }
+
+            case MetadataFlags6::BONES: {
                 //std::vector<Point> m_bones;
                 //m_bones.resize(4);
                 for(int dir = 0; dir < 4; ++dir) {
@@ -152,24 +217,13 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                     fin.read(reinterpret_cast<char*>(&y), 2);
                     //m_bones[dir] = Point(x, y); // assuming Point(x, y) is a thing
                 }
-                //m_attribs.set(attr, true);
-                break;
             }
 
-            // Custom, quickly, just to prove, TO-DO make m_attribs.set
-            case ThingAttrPickupable:
-                itemType.pickupable = true;
+            default: {
+                std::cout << "[DatLoader::unserialize] Unknown flag: "
+                          << static_cast<int>(attr) << std::endl;
                 break;
-                //m_attribs.set(attr, true);
-            default:
-                if(not
-                    ((attr >= ThingAttrGround and attr <= ThingAttrDontCenterOutfit) or
-                    (attr >= ThingAttrOpacity and attr <= ThingAttrNotPreWalkable) or
-                    (attr >= ThingAttrDefaultAction and attr <=ThingLastAttr)))
-                {
-                    std::cout << "[DatLoader::unserialize] Unknown attribute spotted: " << static_cast<int>(attr) << std::endl;
-                }
-                break;
+            }
         }
     }
 
