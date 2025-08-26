@@ -17,4 +17,5 @@ add_executable(OtbDatTransformata main.cpp
         tools.h
         Loaders/ClientIdToServerIdMap.h
         Loaders/DatAttributes.h
+        globals.h
 )

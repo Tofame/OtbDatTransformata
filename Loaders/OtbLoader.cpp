@@ -4,6 +4,7 @@
 #include "fileLoader.h"
 #include "itemLoader_enums.h"
 #include "../tools.h"
+#include "../globals.h"
 
 constexpr auto OTBI = OTB::Identifier{{'O','T', 'B', 'I'}};
 
@@ -142,6 +143,7 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                     if (!stream.read<uint8_t>(alwaysOnTopOrder)) {
                         return false;
                     }
+                    std::cout << "Noticed: " << alwaysOnTopOrder << std::endl;
                     break;
                 }
 
@@ -153,17 +155,58 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                     if (!stream.read<uint16_t>(wareId)) {
                         return false;
                     }
+                    //std::cout << "[Noticing - Items::loadFromOtb] WareId " << wareId << std::endl;
                     break;
                 }
 
                 case ITEM_ATTR_CLASSIFICATION: {
-                    if (!stream.skip(1)) {
+                    uint8_t classification;
+                    if (!stream.read(classification)) {
                         return false;
                     }
+                    std::cout << "[Noticing - Items::loadFromOtb] Classificaiton " << classification << std::endl;
+                    break;
+                }
+
+                case ITEM_ATTR_SPRITEHASH: {
+                    if(!g_otbPrint_SpritesHash) {
+                        stream.skip(datalen);
+                        break;
+                    }
+
+                    // Check if the data length is 16 bytes (128 bits), which is typical for an MD5 hash.
+                    // If it's not, you might have an issue or a different hashing algorithm.
+                    if (datalen != 16) {
+                        std::cout << "[Warning] Sprite hash for item ID " << serverId
+                                  << " has unexpected size: " << datalen << std::endl;
+                    }
+
+                    // Create a buffer to store the hash data.
+                    std::vector<uint8_t> hashData(datalen);
+                    for (size_t i = 0; i < datalen; ++i) {
+                        if (!stream.read<uint8_t>(hashData[i])) {
+                            return false;
+                        }
+                    }
+
+                    // Print the item ID, the size of the hash, and the hash itself.
+                    // The hash is printed in hexadecimal format for readability.
+                    std::cout << "Item ID: " << serverId
+                              << ", Sprite Hash Size: " << datalen
+                              << ", Hash: ";
+
+                    for (size_t i = 0; i < hashData.size(); ++i) {
+                        std::cout << std::hex << static_cast<int>(hashData[i]);
+                    }
+                    std::cout << std::dec << std::endl;
                     break;
                 }
 
                 default: {
+                    if(attrib >= ITEM_ATTR_DESCR and attrib <= ITEM_ATTR_DESCR) {
+                        std::cout << "[OtbLoader::loadFromOtb] Noticed " << static_cast<int>(attrib) << std::endl;
+                    }
+
                     if (attrib < ITEM_ATTR_FIRST || attrib > ITEM_ATTR_LAST) {
                         std::cout << "[OtbLoader::loadFromOtb] Unknown item attr "
                                   << static_cast<int>(attrib) << ", skip " << static_cast<int>(datalen) << " data\n";
