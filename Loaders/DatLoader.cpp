@@ -71,13 +71,23 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
             break;
         }
 
-        // if(g_game.getClientVersion() >= 1000) {
-        if(attr == 16)
-            attr = ThingAttrNoMoveAnimation;
-        else if(attr > 16)
-            attr -= 1;
-        //} else if (g_game.getClientVersion() >= 780) {
-        // other stuff for other protocols...
+        if(g_protocolVersion >= 1000) {
+            /* In 10.10+ all attributes from 16 and up were
+             * incremented by 1 to make space for 16 as
+             * "No Movement Animation" flag.
+             */
+            if(attr == 16)
+                attr = ThingAttrNoMoveAnimation;
+            else if(attr > 16)
+                attr -= 1;
+        } else if(g_protocolVersion >= 860) {
+            /* Default attribute values follow
+             * the format of 8.6-9.86.
+             * Therefore no changes here.
+             */
+        } else {
+            throw std::runtime_error("DatLoader::unserialize - no protocols below 8.6 are supported, change globals.h, or add support.");
+        }
 
         switch(attr) {
             case ThingAttrGround: {
