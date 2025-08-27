@@ -361,6 +361,9 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                     fin.read(reinterpret_cast<char *>(&minimum), sizeof(minimum));
                     uint32_t maximum = 0;
                     fin.read(reinterpret_cast<char *>(&maximum), sizeof(maximum));
+                    if(minimum > maximum) {
+                        std::cout << "[WARNING]: Cid " << cid << " item has minimum greater than maximum - " << minimum << ">" << maximum << "\n";
+                    }
                     frameGroup.frameDurations[i] = FrameDuration(minimum, maximum);
                 }
             //}

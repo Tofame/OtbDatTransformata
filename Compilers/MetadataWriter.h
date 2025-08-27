@@ -49,13 +49,13 @@ public:
             writer.write<uint8_t>(frameGroup.frames);   // Write frames
 
             if (frameDurations && frameGroup.isAnimation) {
-                writer.write<uint8_t>((uint8_t)frameGroup.animationMode);   // Write animation type
-                writer.write<uint8_t>(frameGroup.loopCount);        // Write loop count
-                writer.write<uint8_t>(frameGroup.startFrame);      // Write start frame
+                writer.write<uint8_t>(static_cast<uint8_t>(frameGroup.animationMode));   // 1 byte
+                writer.write<int32_t>(frameGroup.loopCount);       // 4 bytes
+                writer.write<int8_t>(frameGroup.startFrame);       // 1 byte
 
-                for (i = 0; i < frameGroup.frames; i++) {
-                    writer.write<uint32_t>(frameGroup.frameDurations[i].minimum); // Write minimum duration
-                    writer.write<uint32_t>(frameGroup.frameDurations[i].maximum); // Write maximum duration
+                for (uint8_t i = 0; i < frameGroup.frames; i++) {
+                    writer.write<uint32_t>(frameGroup.frameDurations[i].minimum); // 4 bytes
+                    writer.write<uint32_t>(frameGroup.frameDurations[i].maximum); // 4 bytes
                 }
             }
 
