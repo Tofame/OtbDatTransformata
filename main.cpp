@@ -66,8 +66,7 @@ int main() {
 
     // Prepare substitute itemtype for e.g. deprecateds
     items.substituteItemType = ItemType();
-    items.substituteItemType = datItems.at(100);
-    items.substituteItemType.moveable = false;
+//    items.substituteItemType = datItems.at(100);
 
     std::cout << "\n=====Start compiling\n";
     DatCompiler datCompiler;
