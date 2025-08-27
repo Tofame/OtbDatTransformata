@@ -48,7 +48,7 @@ public:
             writer.write<uint8_t>(frameGroup.patternZ); // Write pattern Z
             writer.write<uint8_t>(frameGroup.frames);   // Write frames
 
-            if (frameDurations && frameGroup.isAnimation) {
+            if (frameDurations && (frameGroup.frames > 1 || frameGroup.isAnimation)) {
                 writer.write<uint8_t>(static_cast<uint8_t>(frameGroup.animationMode));   // 1 byte
                 writer.write<int32_t>(frameGroup.loopCount);       // 4 bytes
                 writer.write<int8_t>(frameGroup.startFrame);       // 1 byte
