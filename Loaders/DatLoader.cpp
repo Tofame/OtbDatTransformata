@@ -7,7 +7,6 @@
 bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
     m_datSignature = 0;
-    m_contentRevision = 0;
     m_rawRest.clear();
 
     try {
@@ -19,9 +18,8 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
             throw std::runtime_error("Failed to open DAT file: " + datFile);
         }
 
-        // Read signature and revision
+        // Read signature
         fin.read(reinterpret_cast<char *>(&m_datSignature), sizeof(m_datSignature));
-        m_contentRevision = static_cast<uint16_t>(m_datSignature);
 
         // Read the item count, outfit count, effect count, missiles count (distance effects)
         fin.read(reinterpret_cast<char *>(&m_loadedItemsCount), sizeof(m_loadedItemsCount));
@@ -74,10 +72,9 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
 void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin) {
     itemType.clientId = cid;
 
-    int count = 0, attr = -1;
+    int attr = -1;
     bool done = false;
     for(int i = 0; i < ThingLastAttr; ++i) {
-        count++;
         attr = fin.get();
         if(attr == ThingLastAttr) {
             done = true;

@@ -24,6 +24,5 @@ class DatLoader
     }
 private:
     bool m_datLoaded = false;
-    uint16_t m_contentRevision = 0;
     std::vector<char> m_rawRest;
 };
