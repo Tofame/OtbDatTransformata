@@ -172,7 +172,6 @@ public:
             stream.write<uint16_t>(type.marketCategory);
             stream.write<uint16_t>(type.marketTradeAs);
             stream.write<uint16_t>(type.marketShowAs);
-            stream.write<uint16_t>(static_cast<uint16_t>(type.marketName.size()));
             stream.writeString(type.marketName);
             stream.write<uint16_t>(type.marketRestrictProfession);
             stream.write<uint16_t>(type.marketRestrictLevel);
