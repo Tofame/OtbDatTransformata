@@ -65,9 +65,9 @@ int main() {
     std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
 
     // Prepare substitute itemtype for e.g. deprecateds
-    items.dollItemTypeEmpty = ItemType();
-    items.dollItemTypeEmpty = datItems.at(100);
-    items.dollItemTypeEmpty.moveable = false;
+    items.substituteItemType = ItemType();
+    items.substituteItemType = datItems.at(100);
+    items.substituteItemType.moveable = false;
 
     std::cout << "\n=====Start compiling\n";
     DatCompiler datCompiler;

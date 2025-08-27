@@ -52,7 +52,7 @@ class Items
 
         // itemtype when using for e.g. deprecated items as a substitute for them.
         // Should be based on any empty found itemtype from .otb/.dat
-        ItemType dollItemTypeEmpty;
+        ItemType substituteItemType;
     private:
         std::vector<ItemType> itemTypes;
         ClientIdToServerIdMap clientIdToServerIdMap;

@@ -31,8 +31,8 @@ void DatCompiler::compile(DatLoader& datLoader, Items& items) {
     for (uint32_t id = g_MIN_ITEM_ID; id < itemTypes.size(); id++) {
         auto& otb_it = itemTypes.at(id);
         if(otb_it.group == ITEM_GROUP_DEPRECATED) { //|| issueProneIds.count(id)) {
-            metaWriter->writeItemProperties(items.dollItemTypeEmpty, writer);
-            metaWriter->writeTexturePatterns(items.dollItemTypeEmpty, writer);
+            metaWriter->writeItemProperties(items.substituteItemType, writer);
+            metaWriter->writeTexturePatterns(items.substituteItemType, writer);
         } else {
             auto& dat_it = datItemTypes.at(otb_it.clientId);
             metaWriter->writeItemProperties(dat_it, writer);
