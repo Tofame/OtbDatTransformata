@@ -23,7 +23,7 @@ void DatCompiler::compile(DatLoader& datLoader, Items& items) {
 
     auto& itemTypes = items.getItemTypes();
     auto& datItemTypes = items.getItemTypesDat();
-    writer.write<uint16_t>(itemTypes.size());
+    writer.write<uint16_t>(itemTypes.size() - 1);
     writer.write<uint16_t>(datLoader.m_loadedOutfitsCount);
     writer.write<uint16_t>(datLoader.m_loadedEffectsCount);
     writer.write<uint16_t>(datLoader.m_loadedMissilesCount);
