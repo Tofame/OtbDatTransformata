@@ -1,3 +1,5 @@
+**Disclaimer: Unless otherwise stated, all rights to this tool are reserved by the author. This software may not be copied, modified (except via a pull request to this repository), or sold - either in its original or edited form — without the express written permission of the author.**
+
 Requires ``items.otb`` and ``Tibia.dat`` in ``data/items/`` (folder needs to be created in 'working directory', you probably will need to setup it yourself for the project)
 
 Succesfully loads ``.dat`` and ``.otb`` of Tibia protocol 10.98, and this project's purpose is to showcase the way to do it, nothing less nothing more.
