@@ -283,8 +283,8 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
         }
 
         iType.blockSolid = hasBitSet(FLAG_BLOCK_SOLID, flags);
-        iType.blockProjectile = hasBitSet(FLAG_BLOCK_PROJECTILE, flags);
-        iType.blockPathFind = hasBitSet(FLAG_BLOCK_PATHFIND, flags);
+        iType.blockMissile = hasBitSet(FLAG_BLOCK_PROJECTILE, flags);
+        iType.blockPathfind = hasBitSet(FLAG_BLOCK_PATHFIND, flags);
         iType.hasHeight = hasBitSet(FLAG_HAS_HEIGHT, flags);
         iType.useable = hasBitSet(FLAG_USEABLE, flags);
         iType.pickupable = hasBitSet(FLAG_PICKUPABLE, flags);

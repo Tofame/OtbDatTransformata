@@ -148,6 +148,18 @@ public:
         std::copy(str.begin(), str.end(), std::back_inserter(buffer));
     }
 
+    bool saveToFile(const std::string& filePath) const {
+        std::ofstream out(filePath, std::ios::binary);
+        if (!out) {
+            return false;
+        }
+        out.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        return true;
+    }
+
+    void writeBytes(const char* data, size_t size) {
+        buffer.insert(buffer.end(), data, data + size);
+    }
 private:
     std::vector<char> buffer;
 };

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include "Loaders/itemLoader_enums.h"
+#include "FrameGroup.h"
 #include <fstream>
 
 enum SlotPositionBits : uint32_t {
@@ -94,7 +95,7 @@ public:
     uint16_t transformToOnUse[2] = {0, 0};
     uint16_t transformToFree = 0;
     uint16_t destroyTo = 0;
-    uint16_t maxTextLen = 0;
+    uint16_t maxTextLength = 0;
     uint16_t writeOnceItemId = 0;
     uint16_t transformEquipTo = 0;
     uint16_t transformDeEquipTo = 0;
@@ -127,8 +128,6 @@ public:
     bool walkStack = true;
     bool blockSolid = false;
     bool blockPickupable = false;
-    bool blockProjectile = false;
-    bool blockPathFind = false;
     bool allowPickupable = false;
     bool showDuration = false;
     bool showCharges = false;
@@ -149,7 +148,81 @@ public:
     bool stopTime = false;
     bool showCount = true;
 
-    // Dat properties
-    uint8_t height;
-    uint8_t width;
+    // Added to make it possible to compile .dat based on items.
+    bool hasLight = false;
+    bool hasOffset = false;
+    uint16_t offsetX = 0;
+    uint16_t offsetY = 0;
+    bool animateAlways = false;
+    bool isGround = false;
+    bool isGroundBorder = false;
+    uint16_t groundSpeed = 0;
+    bool isOnBottom = false;
+    bool isOnTop = false;
+    bool isContainer = false;
+    bool isFluidContainer = false;
+    bool isFluid = false;
+    bool isUnpassable = false;
+    bool isUnmoveable = false;
+    bool blockMissile = false; // blockProjectile
+    bool blockPathfind = false;
+    bool noMoveAnimation = false;
+    bool isTranslucent = false;
+    bool hasElevation = false;
+    uint16_t elevation = 0;
+    bool isLyingObject = false;
+    bool isFullGround = false;
+    bool ignoreLook = false;
+    bool cloth = false;
+    uint16_t clothSlot = 0;
+    bool isMarketItem = false;
+    uint16_t marketCategory = 0;
+    uint16_t marketTradeAs = 0;
+    uint16_t marketShowAs = 0;
+    std::string marketName;
+    uint16_t marketRestrictProfession = 0;
+    uint16_t marketRestrictLevel = 0;
+    bool hasDefaultAction = false;
+    uint16_t defaultAction = 0;
+    bool wrappable = false;
+    bool unwrappable = false;
+    bool bottomEffect = false;
+    bool multiUse = false;
+    bool writable = false;
+    bool writableOnce = false;
+    bool hangable = false;
+    bool dontHide = false;
+    bool miniMap = false;
+    uint8_t miniMapColor = 0;
+    bool isLensHelp = false;
+    uint16_t lensHelp = 0;
+    bool usable = false;
+
+    std::vector<FrameGroup> frameGroups;
+    // Get a FrameGroup at a given index
+    FrameGroup& getFrameGroup(uint32_t groupType) {
+        if(groupType >= frameGroups.size()) {
+            auto _group = FrameGroup();
+//            if (category == ThingCategory.MISSILE)
+//            {
+//                _group.patternX = 3;
+//                _group.patternY = 3;
+//            }
+            _group.spriteIndex.resize(_group.getTotalSprites());
+            this->setFrameGroup(groupType, _group);
+
+            // Should've been using: but ehhh that.
+            //throw std::out_of_range("Invalid frame group index. Size: " + std::to_string(frameGroups.size()));
+        }
+        return frameGroups[groupType];
+    }
+    // Set a FrameGroup at a given index
+    void setFrameGroup(uint32_t groupType, const FrameGroup& frameGroup) {
+        // Ensure vector is large enough
+        if(groupType >= frameGroups.size()) {
+            frameGroups.resize(groupType + 1); // Default-construct missing elements
+        }
+        frameGroups[groupType] = frameGroup;
+        frameGroups[groupType].type = groupType;
+    }
 };

@@ -3,6 +3,7 @@
 #include "Items.h"
 #include "Loaders/OtbLoader.h"
 #include "Loaders/DatLoader.h"
+#include "Compilers/DatCompiler.h"
 
 int main() {
     auto items = Items();
@@ -29,10 +30,10 @@ int main() {
         try {
             auto& datItem = datItems.at(otbItem.clientId);
 
-            if(otbItem.pickupable) {
+            if(datItem.pickupable) {
                 if(!datItem.pickupable) {
                     datOtbMatch = false;
-                    std::cerr << "Cid " << otbItem.clientId << " " << datItem.clientId << " Sid " << otbItem.id << " are not matching pickupable (ERROR)!\n";
+                    std::cerr << "Cid " << otbItem.clientId << " " << datItem.clientId << " Sid " << otbItem.id << " are not matching pickupable (.dat side) (ERROR)!\n";
                 }
             }
         } catch (const std::exception& e) {
@@ -45,10 +46,30 @@ int main() {
     if(!datOtbMatch) {
         std::cerr << "Result: The files .dat and .otb are NOT matching!\n";
     } else {
-        std::cout << "Result: .dat and .otb are matching, properly loaded too!";
+        std::cout << "Result: .dat and .otb are matching, properly loaded too!\n";
     }
 
     std::cout << "==== Duplicate Check =====\n";
     //items.checkDuplicatedClientIds();
+
+    std::cout << "==== Check if there is any otb it that doesnt point to dat item =====\n";
+    for(auto& _it : otbItems) {
+        try {
+            auto &datItem = datItems.at(_it.clientId);
+        } catch (const std::exception& e) {
+            std::cout << "Found otb with clientId " << _it.clientId
+                      << " that has no dat item\n";
+            break;
+        }
+    }
+    std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
+
+    // Prepare substitute itemtype for e.g. deprecateds
+    items.substituteItemType = ItemType();
+//    items.substituteItemType = datItems.at(100);
+
+    std::cout << "\n=====Start compiling\n";
+    DatCompiler datCompiler;
+    datCompiler.compile(datLoader, items);
     return 0;
 }
