@@ -41,13 +41,26 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
         }
 
         // Preserve remaining bytes (outfits, effects, missiles)
+        // 1. Determine how many bytes are left in the file
         std::streampos restStart = fin.tellg();
         fin.seekg(0, std::ios::end);
         std::streampos restEnd = fin.tellg();
         size_t restSize = static_cast<size_t>(restEnd - restStart);
 
+        // 2. Resize the vector to exactly hold the remaining bytes
         m_rawRest.resize(restSize);
+
+        // 3. Seek back to the start of the leftover section
         fin.seekg(restStart, std::ios::beg);
+
+        // 4. Read directly into the vector
+//        if (restSize > 0) {
+//            fin.seekg(restStart, std::ios::beg);
+//            fin.read(m_rawRest.data(), restSize);
+//            if (!fin) {
+//                throw std::runtime_error("Failed to read leftover bytes from DAT file");
+//            }
+//        }
         fin.read(m_rawRest.data(), restSize);
 
         m_datLoaded = true;
