@@ -132,6 +132,18 @@ int main() {
         }
     }
 
+    // Print allowDistRead
+    if(Settings::getInstance().printItemsWithAllowDistRead) {
+        int i = 0;
+        for (auto &otbItem: otbItems) {
+            if (otbItem.allowDistRead) {
+                i++;
+                std::cout << "Sid " << otbItem.id << " is dist read\n";
+            }
+        }
+        std::cout << "Total Items that allow distRead: " << i << "\n";
+    }
+
     // Prepare substitute itemtype for e.g. deprecateds
     items.substituteItemType = ItemType();
 

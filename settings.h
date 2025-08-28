@@ -38,6 +38,8 @@ public:
     bool isFrameGroups = false;
     bool fixBlackTekQuiver = false;
 
+    bool printItemsWithAllowDistRead = false;
+
     void load(const std::string& filename = "settings.toml") {
         try {
             auto config = toml::parse_file(filename);
@@ -62,6 +64,8 @@ public:
             MIN_ITEM_ID          = config["MIN_ITEM_ID"].value_or(100u);
 
             fixBlackTekQuiver = config["fixBlackTekQuiver"].value_or(false);
+
+            printItemsWithAllowDistRead = config["printItemsWithAllowDistRead"].value_or(false);
         }
         catch (const toml::parse_error& err) {
             std::cerr << "Error parsing settings.toml: " << err.description()

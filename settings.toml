@@ -5,6 +5,11 @@ isExtended = true # >=960 is always true
 isFrameDurations = true # >=1050 is always true
 isFrameGroups = true # >=1057 is always true
 
+# Print's for items that are already covered by items.xml/.toml.
+# The allowDistRead was an otb-exclusive flag, but it seems nobody continued to use it, and it's
+# covered in the normal files.
+printItemsWithAllowDistRead = false
+
 # Only related to BlackTek
 fixBlackTekQuiver = false
 # BlackTek server has used 'Hunter's Quiver' as an example for a functional quiver.
