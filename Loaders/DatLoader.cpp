@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include "DatLoader.h"
 #include "DatAttributes.h"
 #include "../settings.h"
@@ -15,7 +16,10 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
 
         std::ifstream fin(datFile, std::ios::binary);
         if (!fin.is_open()) {
-            throw std::runtime_error("Failed to open DAT file: " + datFile);
+            throw std::runtime_error(
+                    "Failed to open DAT file: " + datFile +
+                    " (Looked in: " + std::filesystem::absolute(datFile).string() + ")"
+            );
         }
 
         // Read signature

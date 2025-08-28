@@ -9,10 +9,16 @@ int main() {
     auto items = Items();
 
     auto otbLoader = OtbLoader();
-    otbLoader.loadFromOtb("data/items/items.otb", items);
-
     auto datLoader = DatLoader();
-    datLoader.loadFromDat("data/items/Tibia.dat", items);
+    try {
+        otbLoader.loadFromOtb("data/items/items.otb", items);
+        datLoader.loadFromDat("data/items/Tibia.dat", items);
+    } catch (const std::exception& e) {
+        std::cerr << "[Error] " << e.what() << std::endl;
+        std::cout << "\nPress ENTER to exit...";
+        std::cin.get();
+        return 1;
+    }
 
     // Variables
     auto& datItems = items.getItemTypesDat();

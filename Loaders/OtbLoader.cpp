@@ -10,6 +10,14 @@ constexpr auto OTBI = OTB::Identifier{{'O','T', 'B', 'I'}};
 
 bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
 {
+    // Check if file exists first
+    if (!std::filesystem::exists(file)) {
+        throw std::runtime_error(
+                "Failed to open OTB file: " + file +
+                " (Looked in: " + std::filesystem::absolute(file).string() + ")"
+        );
+    }
+
     OTB::Loader loader{file, OTBI};
 
     auto& root = loader.parseTree();
