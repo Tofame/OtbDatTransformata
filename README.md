@@ -2,7 +2,8 @@
 
 Requires ``items.otb`` and ``Tibia.dat`` in ``data/items/`` (folder needs to be created in 'working directory' - settable in project settings of a compiler, or next to .exe if using a build)
 
-Succesfully loads ``.dat`` and ``.otb`` of Tibia protocol 10.98, and this project's purpose is to showcase the way to do it, nothing less nothing more.
+Succesfully loads ``.dat`` and ``.otb`` of Tibia protocol 10.98, and this project's purpose is to showcase the way to do it.
+
 Additional feature that has been added is that the program can now convert old style ``Tibia.dat`` to a new one, ordered by server id's. Such action is irreversible (advised backup),
 however it's a single-time operation, and after that `.otb` format becomes obsolete, since new 'client ids' in the new `.dat`, will be matching ids previously known as server ids.
 Since sid==cid... that means we just have a single id now :)
