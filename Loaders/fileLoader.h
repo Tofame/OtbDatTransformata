@@ -7,6 +7,8 @@
 #include <string_view>
 #include <fstream>
 #include <memory>
+#include <iostream>
+#include <filesystem>
 
 class PropStream;
 
@@ -154,6 +156,9 @@ public:
             return false;
         }
         out.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+
+        std::filesystem::path absPath = std::filesystem::absolute(filePath);
+        std::cout << "[SUCCESS] File successfully written to: " << absPath << "\n";
         return true;
     }
 
