@@ -18,19 +18,32 @@ int main() {
     auto& datItems = items.getItemTypesDat();
     auto& otbItems = items.getItemTypes();
 
+    // Tests of .otb/.dat, for stage 1
+    bool _checkCidSidMap = false;
+    bool _checkDatOtbMatch = false;
+    bool _printDuplicatedClientIds = false; // it's always gonna happen, it's whole reason .otb and .dat exist
+    // because one server id itemtype can point to several client ids.
+    bool _checkMissingClientItems = false; // that situation shouldn't be possible, if it is, it means something
+    // went VERY wrong. There is always more sids than cids, and OTB is based on DAT, so a SID item should ALWAYS
+    // point to atleast one CID item.
+
     // Crystal Coins (serverId 2160) proof of correct loading:
-    std::cout << otbItems.at(2160).clientId << "\n";
-    std::cout << items.getCidToSidMap().getServerId(otbItems.at(2160).clientId) << "\n";
-    std::cout << "\n";
+    if(_checkCidSidMap) {
+        std::cout << "==== Check cid/sid mapping by using Crystal Coin ====\n";
+        std::cout << otbItems.at(2160).clientId << "\n";
+        std::cout << items.getCidToSidMap().getServerId(otbItems.at(2160).clientId) << "\n";
+        std::cout << "\n";
+    }
 
     // Let's check if .dat == .otb
-    std::cout << "Checking if .dat == .otb, by pickupable flag:\n";
+    if(_checkDatOtbMatch) {
+    std::cout << "==== Check if .dat == .otb, by pickupable flag ====\n";
     bool datOtbMatch = true;
     for (auto& otbItem : otbItems) {
         try {
             auto& datItem = datItems.at(otbItem.clientId);
 
-            if(datItem.pickupable) {
+            if(otbItem.pickupable) {
                 if(!datItem.pickupable) {
                     datOtbMatch = false;
                     std::cerr << "Cid " << otbItem.clientId << " " << datItem.clientId << " Sid " << otbItem.id << " are not matching pickupable (.dat side) (ERROR)!\n";
@@ -44,29 +57,34 @@ int main() {
     }
 
     if(!datOtbMatch) {
-        std::cerr << "Result: The files .dat and .otb are NOT matching!\n";
+        std::cerr << "Result: The files .dat and .otb are NOT matching, update .otb first!\n";
+        return 0;
     } else {
         std::cout << "Result: .dat and .otb are matching, properly loaded too!\n";
     }
-
-    std::cout << "==== Duplicate Check =====\n";
-    //items.checkDuplicatedClientIds();
-
-    std::cout << "==== Check if there is any otb it that doesnt point to dat item =====\n";
-    for(auto& _it : otbItems) {
-        try {
-            auto &datItem = datItems.at(_it.clientId);
-        } catch (const std::exception& e) {
-            std::cout << "Found otb with clientId " << _it.clientId
-                      << " that has no dat item\n";
-            break;
-        }
     }
-    std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
+
+    if(_printDuplicatedClientIds) {
+        std::cout << "\n==== Duplicate Check =====\n";
+        items.checkDuplicatedClientIds();
+    }
+
+    if(_checkMissingClientItems) {
+        std::cout << "\n==== Check if there is any otb item that doesnt point to dat item =====\n";
+        for (auto &_it: otbItems) {
+            try {
+                auto &datItem = datItems.at(_it.clientId);
+            } catch (const std::exception &e) {
+                std::cout << "Found otb with clientId " << _it.clientId
+                          << " that has no dat item\n";
+                break;
+            }
+        }
+        std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
+    }
 
     // Prepare substitute itemtype for e.g. deprecateds
     items.substituteItemType = ItemType();
-//    items.substituteItemType = datItems.at(100);
 
     std::cout << "\n=====Start compiling\n";
     DatCompiler datCompiler;
