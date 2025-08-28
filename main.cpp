@@ -32,6 +32,7 @@ int main() {
     bool _checkMissingClientItems = false; // that situation shouldn't be possible, if it is, it means something
     // went VERY wrong. There is always more sids than cids, and OTB is based on DAT, so a SID item should ALWAYS
     // point to atleast one CID item.
+    bool _printWarningsAboutMarket = false; // candidate for settings.toml (?)
 
     // Crystal Coins (serverId 2160) proof of correct loading:
     if(_checkCidSidMap) {
@@ -95,6 +96,40 @@ int main() {
         _qdat.isContainer = true;
         auto &_qotb = otbItems.at(12425);
         _qotb.isContainer = true;
+    }
+
+    // Setup Market attributes (convert from Cid to Sid, ware id (trade as) and show as)
+    // in preparation for compiling.
+    for (auto& datItem : datItems) {
+        auto showAs = datItem.marketShowAs;
+        auto tradeAs = datItem.marketTradeAs; // == wareId
+        auto clientId = datItem.clientId;
+        if(showAs == 0 && tradeAs == 0) {
+            continue;
+        }
+        if(clientId == 0) {
+            std::cout << "[ERROR] Somehow dat item has clientId equal 0\n";
+        }
+        auto serverId = items.getCidToSidMap().getServerId(clientId);
+
+        // Just a curiosity of mine if items are always traded as what they are.
+        // It's not true, example is Hallowed Axe - a special type of axe, that
+        // when traded returns to normal axe.
+        if (_printWarningsAboutMarket) {
+            if(tradeAs != clientId) {
+                std::cout << "Warning - wareId (tradeAs) " << tradeAs << " is not matching client id - " << clientId << " (sid " << serverId << ")\n";
+                std::cout << "Server Id of the tradeAs's clientId: " << items.getCidToSidMap().getServerId(tradeAs) << "\n";
+            }
+        }
+
+        // Swap Trade As id to Server-Id
+        if(tradeAs != 0) {
+            datItem.marketTradeAs = items.getCidToSidMap().getServerId(tradeAs);
+        }
+        // Swap Show As id to Server-Id
+        if(showAs != 0) {
+            datItem.marketShowAs = items.getCidToSidMap().getServerId(showAs);
+        }
     }
 
     // Prepare substitute itemtype for e.g. deprecateds
