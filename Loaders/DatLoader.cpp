@@ -2,7 +2,7 @@
 #include <iostream>
 #include "DatLoader.h"
 #include "DatAttributes.h"
-#include "../globals.h"
+#include "../settings.h"
 
 bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
@@ -30,7 +30,7 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
         // Load items
         auto &itemTypesDat = items.getItemTypesDat();
         itemTypesDat.resize(m_loadedItemsCount + 1);
-        uint16_t firstId = g_MIN_ITEM_ID; // .dat items start at 100
+        uint16_t firstId = Settings::getInstance().MIN_ITEM_ID; // .dat items start at 100
 
         for (uint16_t id = firstId; id < itemTypesDat.size(); ++id) {
             auto type = ItemType();
@@ -81,7 +81,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
             break;
         }
 
-        if(g_protocolVersion >= 1000) {
+        if(Settings::getInstance().protocolVersion >= 1000) {
             /* In 10.10+ all attributes from 16 and up were
              * incremented by 1 to make space for 16 as
              * "No Movement Animation" flag.
@@ -90,7 +90,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
                 attr = ThingAttrNoMoveAnimation;
             else if(attr > 16)
                 attr -= 1;
-        } else if(g_protocolVersion >= 860) {
+        } else if(Settings::getInstance().protocolVersion >= 860) {
             /* Default attribute values follow
              * the format of 8.6-9.86.
              * Therefore no changes here.
@@ -353,7 +353,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
         } else {
             // not really needed for our app, OB would use it probably (?), however Writer won't use it anyway
             // only uses it when: frameGroup.width > 1 || frameGroup.height > 1
-            frameGroup.exactSize = g_SpritesExactSize;
+            frameGroup.exactSize = Settings::getInstance().spritesExactSize;
         }
 
         frameGroup.layers = fin.get();
@@ -399,7 +399,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
         }
 
         // Calculate the number of bytes to read for sprites
-        const size_t bytesToRead = totalSprites * (g_extended ? sizeof(uint32_t) : sizeof(uint16_t));
+        const size_t bytesToRead = totalSprites * (Settings::getInstance().isExtended ? sizeof(uint32_t) : sizeof(uint16_t));
         std::streampos currentPos = fin.tellg();
         fin.seekg(0, std::ios::end);
         std::streampos endPos = fin.tellg();
@@ -415,7 +415,7 @@ void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin
 
         //fin.ignore(totalSprites * sizeof(uint32_t));
         for (i = 0; i < totalSprites; i++) {
-            if (g_extended) {
+            if (Settings::getInstance().isExtended) {
                 uint32_t spId = 0;
                 if (!fin.read(reinterpret_cast<char*>(&spId), sizeof(spId))) {
                     throw std::runtime_error("Failed to read extended sprite index " + std::to_string(i) +

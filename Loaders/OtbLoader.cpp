@@ -4,7 +4,7 @@
 #include "fileLoader.h"
 #include "itemLoader_enums.h"
 #include "../tools.h"
-#include "../globals.h"
+#include "../settings.h"
 
 constexpr auto OTBI = OTB::Identifier{{'O','T', 'B', 'I'}};
 
@@ -193,7 +193,8 @@ bool OtbLoader::loadFromOtb(const std::string& file, Items& items)
                 }
 
                 case ITEM_ATTR_SPRITEHASH: {
-                    if(!g_otbPrint_SpritesHash) {
+                    // Lets just skip spritehash...
+                    if(true) {
                         stream.skip(datalen);
                         break;
                     }

@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.28)
 project(OtbDatTransformata)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(FetchContent)
+
+# Fetch toml++
+FetchContent_Declare(
+        tomlplusplus
+        GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+        GIT_TAG v3.4.0
+)
+FetchContent_MakeAvailable(tomlplusplus)
 
 add_executable(OtbDatTransformata main.cpp
         Loaders/DatLoader.cpp
@@ -17,7 +28,7 @@ add_executable(OtbDatTransformata main.cpp
         tools.h
         Loaders/ClientIdToServerIdMap.h
         Loaders/DatAttributes.h
-        globals.h
+        settings.h
         Compilers/DatCompiler.h
         Compilers/DatCompiler.cpp
         Compilers/MetadataWriter.h
@@ -27,3 +38,6 @@ add_executable(OtbDatTransformata main.cpp
         Compilers/MetadataReader.h
         FrameGroup.h
 )
+
+target_include_directories(OtbDatTransformata PRIVATE ${tomlplusplus_SOURCE_DIR}/include)
+# target_link_libraries(OtbDatTransformata PRIVATE )

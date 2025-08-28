@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include "DatCompiler.h"
-#include "../globals.h"
+#include "../settings.h"
 #include <memory>
 #include <unordered_set>
 
@@ -12,7 +12,7 @@ static const std::unordered_set<uint32_t> issueProneIds = {
 // 10.98 .dat compiler
 void DatCompiler::compile(DatLoader& datLoader, Items& items) {
     std::unique_ptr<MetadataWriter> metaWriter;
-    if(g_protocolVersion > 986) {
+    if(Settings::getInstance().protocolVersion > 986) {
         metaWriter = std::make_unique<MetadataWriter6>();
     } else {
         std::cout << "DatCompiler::compile currently only supports above 9.86 protocols.\n";
@@ -28,7 +28,7 @@ void DatCompiler::compile(DatLoader& datLoader, Items& items) {
     writer.write<uint16_t>(datLoader.m_loadedEffectsCount);
     writer.write<uint16_t>(datLoader.m_loadedMissilesCount);
 
-    for (uint32_t id = g_MIN_ITEM_ID; id < itemTypes.size(); id++) {
+    for (uint32_t id = Settings::getInstance().MIN_ITEM_ID; id < itemTypes.size(); id++) {
         auto& otb_it = itemTypes.at(id);
         if(otb_it.group == ITEM_GROUP_DEPRECATED) { //|| issueProneIds.count(id)) {
             metaWriter->writeItemProperties(items.substituteItemType, writer);
@@ -44,7 +44,7 @@ void DatCompiler::compile(DatLoader& datLoader, Items& items) {
     const auto& restBytes = datLoader.getBytesOfTheRestOfDat();
     writer.writeBytes(restBytes.data(), restBytes.size());
 
-    if (!writer.saveToFile(g_compileDatPath)) {
+    if (!writer.saveToFile(Settings::getInstance().compileDatPath)) {
         std::cerr << "Failed to save file\n";
     }
 }

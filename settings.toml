@@ -1,0 +1,9 @@
+protocolVersion = 1098 # 1098 = 10.98, protocols 10.11+ supported
+compileDatPath = "items.dat" # where to output the new .dat file.
+
+spritesExactSize = 32 # not sure what should be here anyway, though it's probably not 32.
+MIN_ITEM_ID = 100 # don't change, items always start at 100.
+
+isExtended = true # >=960 is always true
+isFrameDurations = true # >=1050 is always true
+isFrameGroups = true # >=1057 is always true

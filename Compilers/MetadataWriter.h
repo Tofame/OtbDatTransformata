@@ -14,7 +14,7 @@ public:
         return false;
     };
 
-    void writeTexturePatterns(ItemType& it, PropWriteStream& writer, bool extended = g_extended, bool frameDurations = g_frameDurations, bool frameGroups = g_frameGroups)
+    void writeTexturePatterns(ItemType& it, PropWriteStream& writer, bool extended = Settings::getInstance().isExtended, bool frameDurations = Settings::getInstance().isFrameDurations, bool frameGroups = Settings::getInstance().isFrameGroups)
     {
         uint8_t groupCount = 1;
 //        if(frameGroups && type.category == ThingCategory.OUTFIT) {

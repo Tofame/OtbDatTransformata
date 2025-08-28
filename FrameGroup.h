@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
-#include "globals.h"
+#include "settings.h"
 
 struct FrameDuration {
     uint32_t minimum;
@@ -23,7 +23,7 @@ struct Size {
 };
 
 struct SpriteExtent {
-    static constexpr uint32_t DEFAULT_SIZE = g_SpritesExactSize;
+    inline static uint32_t DEFAULT_SIZE = Settings::getInstance().spritesExactSize;
 };
 
 enum class AnimationMode : uint8_t {
