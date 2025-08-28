@@ -36,6 +36,7 @@ public:
     bool isExtended = false;
     bool isFrameDurations = false;
     bool isFrameGroups = false;
+    bool fixBlackTekQuiver = false;
 
     void load(const std::string& filename = "settings.toml") {
         try {
@@ -59,6 +60,8 @@ public:
 
             spritesExactSize     = config["SpritesExactSize"].value_or(32u);
             MIN_ITEM_ID          = config["MIN_ITEM_ID"].value_or(100u);
+
+            fixBlackTekQuiver = config["fixBlackTekQuiver"].value_or(false);
         }
         catch (const toml::parse_error& err) {
             std::cerr << "Error parsing settings.toml: " << err.description()

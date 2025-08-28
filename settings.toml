@@ -4,3 +4,11 @@ compileDatPath = "items.dat" # where to output the new .dat file.
 isExtended = true # >=960 is always true
 isFrameDurations = true # >=1050 is always true
 isFrameGroups = true # >=1057 is always true
+
+# Only related to BlackTek
+fixBlackTekQuiver = false
+# BlackTek server has used 'Hunter's Quiver' as an example for a functional quiver.
+# By default that quiver is only a decorational item and wasn't a container.
+# Setting this option to true WILL KEEP BlackTek's 12425/11469 (SID/CID) quiver itemtype to be still set to CONTAINER.
+# This option is just equivalent to toggling 'Container' option in Object Builder for that particular item, so not a
+# big deal anyway.

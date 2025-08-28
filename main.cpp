@@ -89,6 +89,14 @@ int main() {
         std::cout << "Check complete. If any messages above appeared, some OTB items have no matching DAT item.\n";
     }
 
+    // BlackTek little quiver adjustment
+    if(Settings::getInstance().fixBlackTekQuiver) {
+        auto &_qdat = datItems.at(11469);
+        _qdat.isContainer = true;
+        auto &_qotb = otbItems.at(12425);
+        _qotb.isContainer = true;
+    }
+
     // Prepare substitute itemtype for e.g. deprecateds
     items.substituteItemType = ItemType();
 
