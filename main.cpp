@@ -71,5 +71,8 @@ int main() {
     std::cout << "\n=====Start compiling\n";
     DatCompiler datCompiler;
     datCompiler.compile(datLoader, items);
+
+    std::cout << "\nPress ENTER to exit...";
+    std::cin.get();
     return 0;
 }
