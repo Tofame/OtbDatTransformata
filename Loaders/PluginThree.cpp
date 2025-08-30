@@ -54,7 +54,7 @@ bool PluginThree::unserializeDatAttribute(ItemType &itemType, int& flagByte, std
         }
 
         case ItemFlag::WritableOnce: {
-            itemType.writable = true;
+            itemType.writableOnce = true;
             uint16_t maxLen;
             fin.read(reinterpret_cast<char *>(&maxLen), 2);
             itemType.maxTextLength = maxLen;
