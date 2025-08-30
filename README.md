@@ -13,8 +13,9 @@ Since sid==cid... that means we just have a single id now :)
 
 ***Notes from comparing .dat and .otb, that hopefully will lead to removal of .otb***
 `.otb` format is deemed to not be implementing anything new, it's just a bridge for a unnecessary convention of client-id and server-id which was allegedly created because of some weird
-item removal YEARS ago. `.otb` does not contain anything additional other than *alwaysOnTopOrder=ITEM_ATTR_TOPORDER*, which is calculated anyway based on `type` from .dat.
+item removal YEARS ago. 
 
+`.otb` contains 'semi-custom' *alwaysOnTopOrder=ITEM_ATTR_TOPORDER*, semi, because it is calculated anyway based on `type` from .dat.
 The `.dat` code in question related to stack order:
 ```
                             case ItemFlag.Ground:
