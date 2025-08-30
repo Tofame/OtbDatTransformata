@@ -4,6 +4,8 @@
 #include "DatLoader.h"
 #include "DatAttributes.h"
 #include "../settings.h"
+#include "PluginMain.h"
+#include "PluginThree.h"
 
 bool DatLoader::loadFromDat(const std::string& file, Items& items) {
     m_datLoaded = false; // Start by assuming the load will fail
@@ -76,265 +78,34 @@ bool DatLoader::loadFromDat(const std::string& file, Items& items) {
 void DatLoader::unserialize(ItemType& itemType, uint16_t cid, std::ifstream& fin) {
     itemType.clientId = cid;
 
+    std::unique_ptr<PluginMain> plugin;
+    if(Settings::getInstance().protocolVersion >= 1011) {
+        /* In 10.10+ all attributes from 16 and up were
+         * incremented by 1 to make space for 16 as
+         * "No Movement Animation" flag.
+         */
+        plugin = std::make_unique<PluginThree>();
+    } else {
+        throw std::runtime_error("DatLoader::unserialize - no protocols below 10.11 are supported, change globals.h, or add support.");
+    }
+
+    int prevAttr = -1;
     int attr = -1;
     bool done = false;
-    for(int i = 0; i < ThingLastAttr; ++i) {
+
+    for(int i = 0; i < PluginMain::LastFlag; ++i) {
+        prevAttr = attr;
         attr = fin.get();
-        if(attr == ThingLastAttr) {
+        if(attr == PluginMain::LastFlag) {
             done = true;
             break;
         }
 
-        if(Settings::getInstance().protocolVersion >= 1000) {
-            /* In 10.10+ all attributes from 16 and up were
-             * incremented by 1 to make space for 16 as
-             * "No Movement Animation" flag.
-             */
-            if(attr == 16)
-                attr = ThingAttrNoMoveAnimation;
-            else if(attr > 16)
-                attr -= 1;
-        } else if(Settings::getInstance().protocolVersion >= 860) {
-            /* Default attribute values follow
-             * the format of 8.6-9.86.
-             * Therefore no changes here.
-             */
-        } else {
-            throw std::runtime_error("DatLoader::unserialize - no protocols below 8.6 are supported, change globals.h, or add support.");
-        }
-
-        switch(attr) {
-            case ThingAttrGround: {
-                itemType.isGround = true;
-                uint16_t groundSpeed;
-                fin.read(reinterpret_cast<char*>(&groundSpeed), 2);
-                itemType.groundSpeed = groundSpeed;
-                break;
-            }
-
-            case ThingAttrGroundBorder:
-                itemType.isGroundBorder = true;
-                break;
-
-            case ThingAttrOnBottom:
-                itemType.isOnBottom = true;
-                break;
-
-            case ThingAttrOnTop:
-                itemType.isOnTop = true;
-                break;
-
-            case ThingAttrContainer:
-                itemType.isContainer = true;
-                break;
-
-            case ThingAttrStackable:
-                itemType.stackable = true;
-                break;
-
-            case ThingAttrForceUse:
-                itemType.forceUse = true;
-                break;
-
-            case ThingAttrMultiUse:
-                itemType.multiUse = true;
-                break;
-
-            case ThingAttrFluidContainer:
-                itemType.isFluidContainer = true;
-                break;
-            case ThingAttrSplash: // fluid (splash)
-                itemType.isFluid = true;
-                break;
-
-            // ---- blocking / pathing ----
-            case ThingAttrNotWalkable:
-                itemType.isUnpassable = true;
-                itemType.blockSolid   = true;
-                break;
-            case ThingAttrNotMoveable:
-                itemType.isUnmoveable = true;
-                itemType.moveable     = false;
-                break;
-            case ThingAttrBlockProjectile:
-                itemType.blockMissile    = true; // blockProjectile
-                break;
-            case ThingAttrNotPathable:
-                itemType.blockPathfind = true;
-                break;
-
-            case ThingAttrWritable: {
-                itemType.writable = true;
-                uint16_t maxLen;
-                fin.read(reinterpret_cast<char*>(&maxLen), 2);
-                itemType.maxTextLength = maxLen;
-                break;
-            }
-
-            case ThingAttrWritableOnce: {
-                itemType.writableOnce = true;
-                uint16_t maxLen;
-                fin.read(reinterpret_cast<char*>(&maxLen), 2);
-                itemType.maxTextLength = maxLen;
-                break;
-            }
-
-            case ThingAttrMinimapColor: {
-                uint16_t color;
-                fin.read(reinterpret_cast<char*>(&color), 2);
-                itemType.miniMap = true;
-                itemType.miniMapColor = static_cast<uint8_t>(color);
-                break;
-            }
-
-            case ThingAttrCloth: {
-                uint16_t clothSlot;
-                fin.read(reinterpret_cast<char*>(&clothSlot), 2);
-                itemType.cloth = true;
-                itemType.clothSlot = clothSlot;
-                break;
-            }
-
-            case ThingAttrLensHelp: {
-                uint16_t id;
-                fin.read(reinterpret_cast<char*>(&id), 2);
-                itemType.isLensHelp = true;
-                itemType.lensHelp = id;
-                break;
-            }
-
-            case ThingAttrUsable: {
-                uint16_t val;
-                fin.read(reinterpret_cast<char*>(&val), 2);
-                itemType.usable = true;
-                break;
-            }
-
-            case ThingAttrPickupable:
-                itemType.pickupable = true;
-                break;
-
-            case ThingAttrLight: {
-                uint16_t intensity, color;
-                fin.read(reinterpret_cast<char*>(&intensity), 2);
-                fin.read(reinterpret_cast<char*>(&color), 2);
-                itemType.hasLight = true;
-                itemType.lightLevel = static_cast<uint8_t>(intensity);
-                itemType.lightColor = static_cast<uint8_t>(color);
-                break;
-            }
-
-            case ThingAttrDisplacement: {
-                uint16_t dx, dy;
-                fin.read(reinterpret_cast<char*>(&dx), 2);
-                fin.read(reinterpret_cast<char*>(&dy), 2);
-                itemType.hasOffset = true;
-                itemType.offsetX = dx;
-                itemType.offsetY = dy;
-                break;
-            }
-
-            case ThingAttrElevation: {
-                uint16_t elevation;
-                fin.read(reinterpret_cast<char*>(&elevation), 2);
-                itemType.hasElevation = true;
-                itemType.elevation = elevation;
-                break;
-            }
-
-            case ThingAttrMarket: {
-                itemType.isMarketItem = true;
-                uint16_t len;
-                fin.read(reinterpret_cast<char*>(&itemType.marketCategory), 2);
-                fin.read(reinterpret_cast<char*>(&itemType.marketTradeAs), 2);
-                fin.read(reinterpret_cast<char*>(&itemType.marketShowAs), 2);
-                fin.read(reinterpret_cast<char*>(&len), 2);
-
-                itemType.marketName.resize(len);
-                fin.read(&itemType.marketName[0], len);
-
-                fin.read(reinterpret_cast<char*>(&itemType.marketRestrictProfession), 2);
-                fin.read(reinterpret_cast<char*>(&itemType.marketRestrictLevel), 2);
-                break;
-            }
-
-            case ThingAttrNoMoveAnimation:
-                itemType.noMoveAnimation = true;
-                break;
-
-            // ---- hangable / hooks / rotation ----
-            case ThingAttrHangable:
-                itemType.isHangable = true; // you also have `hangable`; set both if you want
-                itemType.hangable   = true;
-                break;
-            case ThingAttrHookSouth:
-                itemType.isVertical = true;
-                break;
-            case ThingAttrHookEast:
-                itemType.isHorizontal = true;
-                break;
-            case ThingAttrRotateable:
-                itemType.rotatable = true;
-                break;
-
-            // ---- visibility / translucency ----
-            case ThingAttrDontHide:
-                itemType.dontHide = true;
-                break;
-            case ThingAttrTranslucent:
-                itemType.isTranslucent = true;
-                break;
-
-            // ---- corpse/anim ----
-            case ThingAttrLyingCorpse:
-                itemType.isLyingObject = true;
-                break;
-            case ThingAttrAnimateAlways:
-                itemType.animateAlways = true;
-                break;
-
-            // ---- full ground / look ----
-            case ThingAttrFullGround:
-                itemType.isFullGround = true;
-                break;
-            case ThingAttrLook:
-                itemType.ignoreLook = true;
-                break;
-
-            case ThingAttrWrapable:
-                itemType.wrappable = true;
-                break;
-
-            case ThingAttrUnwrapable:
-                itemType.unwrappable = true;
-                break;
-
-            case ThingAttrBones: {
-                //std::vector<Point> m_bones;
-                //m_bones.resize(4);
-                for(int dir = 0; dir < 4; ++dir) {
-                    uint16_t x, y;
-                    fin.read(reinterpret_cast<char*>(&x), 2);
-                    fin.read(reinterpret_cast<char*>(&y), 2);
-                    //m_bones[dir] = Point(x, y); // assuming Point(x, y) is a thing
-                }
-                //m_attribs.set(attr, true);
-                std::cout << "Notices: bones detected, but rn not supported!\n";
-                break;
-            }
-
-            case ThingAttrDefaultAction:
-                uint8_t defaultaction;
-                fin.read(reinterpret_cast<char*>(&defaultaction), 1);
-                itemType.hasDefaultAction = true;
-                itemType.defaultAction = defaultaction;
-                break;
-
-            default:
-                std::cout << "[DatLoader::unserialize] Unknown attribute: "
-                          << static_cast<int>(attr) << std::dec << "\n";
-                break;
-        }
+        if(!plugin->unserializeDatAttribute(itemType, attr, fin)) {
+            std::cout << "[DatLoader::unserialize] Unknown attribute: "
+                      << static_cast<int>(attr) << " previous attr: " << prevAttr << std::dec << "\n";
+            break;
+        };
     }
 
     if(!done)

@@ -39,6 +39,9 @@ add_executable(OtbDatTransformata main.cpp
         Compilers/ThingCategory.h
         Compilers/MetadataReader.h
         FrameGroup.h
+        Loaders/PluginMain.h
+        Loaders/PluginThree.h
+        Loaders/PluginThree.cpp
 )
 
 target_include_directories(OtbDatTransformata PRIVATE ${tomlplusplus_SOURCE_DIR}/include)
