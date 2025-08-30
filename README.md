@@ -39,12 +39,14 @@ The `.dat` code in question related to stack order:
 ```
 
 Analysis on other attributes of .otb that were suspected to be custom, but are not:
+- allowDistRead - probably the only custom stuff that turned out to be from otb. However... as of 10.98, I already see that
+  it is **covered** by ``items.xml`` - 240 search results in vsc's TFS vs 60 search results in OTB.
 - WareID - matches with `Trade as` from .dat's market.
 - Type - ground, podium etc. - taken from .dat
 - Name - the name is market.name from .dat
 - Classification - deprecated
-Description - deprecated
-..many others such as stats like armor etc. deprecated in 7.x iirc
+- Description - deprecated
+- ..many others such as stats like armor etc. deprecated in 7.x iirc
 I suspect a lot where from times, when OTs didn't have items.xml, and stored attr such as `attack`, `armor`, etc. directly in .otb.
 - Spritehash - doesn't appear anywhere other than OTB, unused by rme, otc, tfs.
 I think its only for item editor to know recent changes and display red square in sprite window, to let user know that sprite of the item has been modified.
